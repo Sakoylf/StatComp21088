@@ -1,0 +1,76 @@
+---
+title: "StatCompR"
+author: "sa21204151"
+date: "2021/12/16"
+output: rmarkdown::html_vignette
+vignette: >
+ %\VignetteIndexEntry{StatCompR}
+ %\VignetteEngine{knitr::rmarkdown}
+ %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Overview
+
+_StatComp21088_ is a simple R package developed to achieve the Mini-batch gradient descent algorithm.It could be used to shuffle the sequence of input data and record loss of each iteration.
+
+##Shuffle_sequence function
+The function can be used to shuuffle the sequence of input data(matrix) whose fist column is filled of number one. And the output of the function is a vector of random permutation from 1 to n. n is the rowcount of imput data.
+
+#```{r}
+library(StatComp21088)
+n <- 10
+A <- matrix(rep(1,n*n),n,n)
+shuffle_sequence <- Shuffle_sequence(A)
+print(shuffle_sequence)
+#```
+
+##MBGD function
+
+This function is developed to train the model one time in Mini-batch gradient descent algorithm.The input parameters are input_data,  real_result, batch_size, learning rate alpha and iterative initial value theta. The output is theta after iterations.
+
+#```{r}
+library(StatComp21088)
+x <- seq(0.1,10,0.002)
+n <- length(x)
+y <- 2*x+5+rnorm(n)
+z <- as.matrix(data.frame(rep(1,n),x))
+theta <- MBGD(z, y, 100,0.002,c(1,1))
+print(theta)
+#```
+
+##Cost function
+
+This function is developed to record the loss function of the model. The output is the loss function value of a particular theta.
+
+#```{r}
+library(StatComp21088)
+x <- seq(0.1,10,0.002)
+n <- length(x)
+y <- 2*x+5+rnorm(n)
+z <- as.matrix(data.frame(rep(1,n),x))
+cost <- Cost(z, y, c(1,1))
+print(cost)
+#```
+
+
+##train_MBGD function
+
+This function is developed to add the first column which is full of 1 in input_data matrix,train the model one time in Mini-batch gradient descent algorithm and record the loss function value of the model after every iteration.
+
+#```{r}
+library(StatComp21088)
+x <- seq(0.1,10,0.01)
+n <- length(x)
+z <- rnorm(n)
+y <- 2*x+5+z
+theta <- train_MBGD(x,y,500,200,0.01,c(1,1))$theta
+print(theta)
+cost <- train_MBGD(x,y,500,200,0.01,c(1,1))$cost
+print(cost)
+#```
+
+

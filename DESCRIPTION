@@ -1,0 +1,18 @@
+Package: StatComp21088
+Type: Package
+Title: Mini-batch Gradient Descent
+Version: 1.0
+Date: 2021-12-16
+Author: Haifeng Chen
+Maintainer: Haifeng Chen <cfhai@mail.ustc.edu.cn>
+Description: Achieve the Mini-batch Gradient Descent algorithm.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.7),MASS,bootstrap,boot,RANN,energy,Ball,knitr,microbenchmark,stats
+LinkingTo: Rcpp
+RoxygenNote: 7.1.2
+Encoding: UTF-8
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+URL: http://github.com/Sakoylf/StatComp21088
+BugReports: http://github.com/Sakoylf/StatComp21088/issues
+
