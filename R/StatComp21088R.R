@@ -155,3 +155,4 @@ train_MBGD <- function(input_data,real_result,iter,batch_size,alpha,theta){
   }
   return(list(theta = theta ,cost = cost))
 }
+
