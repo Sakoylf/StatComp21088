@@ -1,0 +1,250 @@
+---
+title: "intro"
+author: "sa21204151"
+date: "2021/12/16"
+output: rmarkdown::html_vignette
+vignette: >
+ %\VignetteIndexEntry{intro}
+ %\VignetteEngine{knitr::rmarkdown}
+ %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+_StatComp21088_ is a simple R package developed to achieve three kinds of gradient descent algorithm.Include Batch Gradient Descent,Stochastic Gradient Descent,Mini-batch gradient descent algorithm.
+
+## Shuffle_sequence function
+
+The function can be used to shuffle the sequence of input data(matrix) whose fist column is filled of number one. And the output of the function is a vector of random permutation from 1 to n. n is the rowcount of imput data.
+
+```{r}
+#library(StatComp21088)
+Shuffle_sequence <- function(data){
+  n <- nrow(data)
+  random_sequence <- sample(1:n,n)
+  return(random_sequence)
+}
+
+n <- 10
+A <- matrix(rep(1,n*n),n,n)
+shuffle_sequence <- Shuffle_sequence(A)
+print(shuffle_sequence)
+```
+
+## Addo function
+
+Before using the algorithm to train the model, the first column of data should be filled with 1.
+
+
+```{r}
+Addo <- function(data){
+    n <- nrow(as.matrix(data))
+    c <- rep(1,n)
+    new_data <- as.matrix(data.frame(c,data))
+  
+    return(new_data)
+}
+
+A = matrix(
+c(1,1,1,1,1,2,3,4),4,2)
+x <- Addo(A)
+print(x)
+
+```
+
+## BGD function
+
+Batch gradient descent algorithm.The idea is to use all samples per iteration to update the parameters.This function is developed to train the model one time in Batch gradient descent algorithm.The input parameters are input_data,  real_result,learning rate alpha and iterative initial value theta. The output is theta after iteration.
+
+```{r}
+BGD <- function(input_data,real_result,alpha,theta){
+  n0 <- nrow(input_data)
+  p0 <- ncol(input_data)
+  gradient_increasment <- matrix(NA,nrow = n0, ncol = p0)
+  for (i in 1:n0){
+      g <- as.numeric(input_data[i,]*as.vector(real_result[i] - input_data[i,]%*%theta))
+      gradient_increasment[i,] <- g
+    }
+    avg_g <- colMeans(gradient_increasment)
+    theta <- theta + alpha * avg_g
+  return(theta)
+}
+
+x <- seq(0.1,10,0.002)
+n <- length(x)
+y <- 2*x+5+rnorm(n)
+z <- as.matrix(data.frame(rep(1,n),x))
+theta <- BGD(z, y,0.002,c(1,1))
+print(theta)
+```
+
+## SGD function
+
+Stochastic gradient descent algorithm.The idea is to use every sample per iteration to update the parameters.This function is developed to train the model in Batch gradient descent algorithm for one iteration.The input parameters are input_data,  real_result,learning rate alpha and iterative initial value theta. The output is theta after iterations.
+
+```{r}
+SGD <- function(input_data,real_result,alpha,theta){
+  
+  shuffle_sequence <- Shuffle_sequence(input_data)
+  x <- input_data[shuffle_sequence,]
+  y <- real_result[shuffle_sequence]
+  n0 <- nrow(x)
+  
+  for (i in 1:n0){
+    g <- as.numeric(x[i,]*as.vector(y[i] - x[i,]%*%theta))
+    theta <- theta + alpha * g
+  }
+  return(theta)
+}
+
+x <- seq(0.1,10,0.002)
+n <- length(x)
+y <- 2*x+5+rnorm(n)
+z <- as.matrix(data.frame(rep(1,n),x))
+theta <- SGD(z, y,0.002,c(1,1))
+print(theta)
+```
+
+## MBGD function
+
+This function is developed to train the model one time in Mini-batch gradient descent algorithm.The input parameters are input_data,  real_result, batch_size, learning rate alpha and iterative initial value theta. The output is theta after iterations.
+```{r}
+MBGD <- function(input_data,real_result,batch_size,alpha,theta){
+  
+  shuffle_sequence <- Shuffle_sequence(input_data)
+  x <- input_data[shuffle_sequence,]
+  y <- real_result[shuffle_sequence]
+  n <- nrow(x)
+  
+  for(start in seq(1,n,batch_size)){
+
+    end <- min(c(start+batch_size-1,n))
+    Mini_train_data <- x[start:end,]
+    Mini_train_result <- y[start:end]
+
+    n0 <- nrow(Mini_train_data)
+    p0 <- ncol(Mini_train_data)
+    gradient_increasment <- matrix(NA,nrow = n0, ncol = p0)
+
+    for (i in 1:n0){
+    g <- as.numeric(Mini_train_data[i,]*as.vector(Mini_train_result[i] - Mini_train_data[i,]%*%theta))
+
+    gradient_increasment[i,] <- g
+    }
+
+    avg_g <- colMeans(gradient_increasment)
+    theta <- theta + alpha * avg_g
+  }
+  return(theta)
+}
+
+x <- seq(0.1,10,0.002)
+n <- length(x)
+y <- 2*x+5+rnorm(n)
+z <- as.matrix(data.frame(rep(1,n),x))
+theta <- MBGD(z, y, 100,0.002,c(1,1))
+print(theta)
+
+```
+
+## Cost function
+
+This function is developed to record the loss function of the model. The output is the loss function value of a particular theta.
+
+```{r}
+
+Cost <- function(input_data,real_result,theta){
+  predict <- input_data%*%theta
+  cost <- predict - real_result
+  cost <- mean(cost^2)
+  return(cost)
+}
+
+
+x <- seq(0.1,10,0.002)
+n <- length(x)
+y <- 2*x+5+rnorm(n)
+z <- as.matrix(data.frame(rep(1,n),x))
+cost <- Cost(z, y, c(1,1))
+print(cost)
+```
+
+
+## train_BGD function
+
+This function is developed to train the model for iterations in batch gradient descent algorithm and record the loss function value of the model after every iteration.
+
+```{r}
+train_BGD <- function(input_data,real_result,iter,alpha,theta){
+  input_data <- Addo(input_data)
+  cost <- numeric(iter)
+  for(i in 1:iter){
+    theta <- BGD(input_data,real_result,alpha,theta)
+    cost[i] <- Cost(input_data,real_result,theta)
+  }
+  return(list(theta = theta ,cost = cost))
+}
+
+x <- seq(0.1,10,0.01)
+n <- length(x)
+z <- rnorm(n)
+y <- 2*x+5+z
+theta <- train_BGD(x,y,500,0.02,c(1,1))
+print(theta)
+
+```
+
+## train_SGD function
+
+This function is developed to train the model for iterations in stochastic gradient descent algorithm and record the loss function value of the model after every iteration.
+
+```{r}
+train_SGD <- function(input_data,real_result,iter,alpha,theta){
+  input_data <- Addo(input_data)
+  cost <- numeric(iter)
+  for(i in 1:iter){
+    theta <- SGD(input_data,real_result,alpha,theta)
+    cost[i] <- Cost(input_data,real_result,theta)
+  }
+  return(list(theta = theta ,cost = cost))
+}
+
+x <- seq(0.1,10,0.01)
+n <- length(x)
+z <- rnorm(n)
+y <- 2*x+5+z
+theta <- train_SGD(x,y,200,0.02,c(1,1))
+print(theta)
+
+```
+
+
+## train_MBGD function
+
+This function is developed to train the model in SGD algorithm for iterations in Mini-batch gradient descent algorithm and record the loss function value of the model after every iteration.
+
+```{r}
+train_MBGD <- function(input_data,real_result,iter,batch_size,alpha,theta){
+  input_data <- Addo(input_data)
+  cost <- numeric(iter)
+  for(i in 1:iter){
+    theta <- MBGD(input_data,real_result,batch_size,alpha,theta)
+    cost[i] <- Cost(input_data,real_result,theta)
+  }
+  return(list(theta = theta ,cost = cost))
+}
+
+x <- seq(0.1,10,0.01)
+n <- length(x)
+z <- rnorm(n)
+y <- 2*x+5+z
+theta <- train_MBGD(x,y,500,200,0.01,c(1,1))
+print(theta)
+
+```
+
+
