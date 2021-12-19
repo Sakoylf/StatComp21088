@@ -1,6 +1,7 @@
 #' @title gibbs function
 #' @name gibbsR
 #' @description a function of gibbs sample
+#' @importFrom stats rbeta rbinom
 #' @param N sample size
 #' @param a The first parameter of the distribution
 #' @param b The second parameter of the distribution

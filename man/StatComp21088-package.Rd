@@ -3,13 +3,13 @@
 \alias{StatComp21088}
 \docType{package}
 \title{
-  Achieve the Mini-batch Gradient Descent algorithm
+  Achieve the Three kinds of gradient descent algorithm
 }
 \description{
-  This package is developed to add the first column which is full of 1 in input_data matrix,train the model one time in Mini-batch gradient descent algorithm and record the loss function value of the model after every iteration.
+  This package is developed to developed to achieve three kinds of gradient descent algorithm.Include Batch Gradient Descent,Stochastic Gradient Descent,Mini-batch gradient descent algorithm.And it will record the loss function value of the model after every iteration.
 }
 \details{
-  Use train_MBGD function to train the model and get the result and the recorded cost.
+  Use train functions to train the model and get the result and the recorded cost.
 }
 \author{
 Haifeng Chen
